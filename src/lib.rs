@@ -30,7 +30,7 @@ use std::sync::{Arc, Weak};
 #[cfg_attr(docsrs, doc(cfg(feature = "blocking")))]
 pub mod blocking;
 mod compat;
-mod dbus_interface;
+pub mod dbus_interface;
 pub mod menu;
 mod service;
 mod tray;

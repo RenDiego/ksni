@@ -237,7 +237,7 @@ impl<T> DbusMenu<T> {
 #[zbus::interface(name = "com.canonical.dbusmenu")]
 impl<T: Tray> DbusMenu<T> {
     // methods
-    async fn get_layout(
+    pub async fn get_layout(
         &self,
         parent_id: i32,
         recursion_depth: i32,
@@ -257,7 +257,7 @@ impl<T: Tray> DbusMenu<T> {
             .ok_or_else(|| zbus::fdo::Error::InvalidArgs("parentId not found".to_string()))
     }
 
-    async fn get_group_properties(
+    pub async fn get_group_properties(
         &self,
         ids: Vec<i32>,
         property_names: Vec<String>,
@@ -272,7 +272,7 @@ impl<T: Tray> DbusMenu<T> {
         Ok(items)
     }
 
-    async fn get_property(&self, id: i32, name: String) -> zbus::fdo::Result<OwnedValue> {
+    pub async fn get_property(&self, id: i32, name: String) -> zbus::fdo::Result<OwnedValue> {
         let service = self.0.lock().await; // do NOT use any self methods after this
         service
             .get_menu_item(id, &[name])
@@ -282,7 +282,7 @@ impl<T: Tray> DbusMenu<T> {
             .unwrap_or_else(|| Err(zbus::fdo::Error::InvalidArgs("property not found".into())))
     }
 
-    async fn event(
+    pub async fn event(
         &self,
         #[zbus(connection)] conn: &Connection,
         id: i32,
@@ -296,7 +296,7 @@ impl<T: Tray> DbusMenu<T> {
             .await
     }
 
-    async fn event_group(
+    pub async fn event_group(
         &self,
         #[zbus(connection)] conn: &Connection,
         events: Vec<(i32, String, OwnedValue, u32)>,
@@ -329,28 +329,28 @@ impl<T: Tray> DbusMenu<T> {
         }
     }
 
-    async fn about_to_show(&self) -> zbus::fdo::Result<bool> {
+    pub async fn about_to_show(&self) -> zbus::fdo::Result<bool> {
         Ok(false)
     }
 
-    async fn about_to_show_group(&self) -> zbus::fdo::Result<(Vec<i32>, Vec<i32>)> {
+    pub async fn about_to_show_group(&self) -> zbus::fdo::Result<(Vec<i32>, Vec<i32>)> {
         Ok(Default::default())
     }
 
     // properties
     #[zbus(property)]
-    fn version(&self) -> zbus::fdo::Result<u32> {
+    pub fn version(&self) -> zbus::fdo::Result<u32> {
         Ok(3)
     }
 
     #[zbus(property)]
-    async fn text_direction(&self) -> zbus::fdo::Result<crate::TextDirection> {
+    pub async fn text_direction(&self) -> zbus::fdo::Result<crate::TextDirection> {
         let service = self.0.lock().await; // do NOT use any self methods after this
         Ok(service.get_text_direction())
     }
 
     #[zbus(property)]
-    async fn status(&self) -> zbus::fdo::Result<crate::menu::Status> {
+    pub async fn status(&self) -> zbus::fdo::Result<crate::menu::Status> {
         let service = self.0.lock().await; // do NOT use any self methods after this
         let status = match service.get_status() {
             crate::tray::Status::Active | crate::tray::Status::Passive => {
@@ -362,7 +362,7 @@ impl<T: Tray> DbusMenu<T> {
     }
 
     #[zbus(property)]
-    async fn icon_theme_path(&self) -> zbus::fdo::Result<Vec<String>> {
+    pub async fn icon_theme_path(&self) -> zbus::fdo::Result<Vec<String>> {
         let service = self.0.lock().await; // do NOT use any self methods after this
         let path = service.get_icon_theme_path();
         let path = if path.is_empty() { vec![] } else { vec![path] };
